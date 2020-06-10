@@ -16,10 +16,12 @@ public final class JavaMethod {
     private final InsnList instructions;
     private final int maxLocals;
     private final int maxStack;
+    private final MemberDeclaration declaration;
 
     public JavaMethod(String name, String desc, int modifiers, JavaClass declaringClass, JavaClass returnType, JavaClass[] parameterTypes, InsnList instructions, int maxLocals, int maxStack) {
         this.name = name;
         this.desc = desc;
+        this.declaration = new MemberDeclaration(declaringClass.getInternalName(), name, desc);
         this.modifiers = modifiers;
         this.declaringClass = declaringClass;
         this.returnType = returnType;
@@ -66,6 +68,10 @@ public final class JavaMethod {
 
     public JavaClass[] getParameterTypes() {
         return parameterTypes;
+    }
+
+    public MemberDeclaration getDeclaration() {
+        return declaration;
     }
 
     public InsnList getInstructions() {

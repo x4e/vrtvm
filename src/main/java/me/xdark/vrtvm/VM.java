@@ -2,9 +2,14 @@ package me.xdark.vrtvm;
 
 import me.xdark.vrtvm.interpreter.InstructionInterpreter;
 import me.xdark.vrtvm.mirror.JavaClass;
+import me.xdark.vrtvm.mirror.JavaMethod;
 import me.xdark.vrtvm.mirror.PrimitiveClass;
+import me.xdark.vrtvm.natives.InvocationHook;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public final class VM {
     private final SystemDictionary dictionary;
@@ -19,6 +24,7 @@ public final class VM {
     private final JavaValue _null;
     private final JavaValue _top;
     private final Instructions instructions;
+    private final Map<MemberDeclaration, InvocationHook> hooks = new HashMap<>(64);
 
     public VM() {
         // Setup dictionary
@@ -38,8 +44,21 @@ public final class VM {
         instructions = new Instructions();
     }
 
+    public void installHook(MemberDeclaration declaration, InvocationHook hook) {
+        hooks.put(declaration, hook);
+    }
+
+    public void removeHook(MemberDeclaration declaration) {
+        hooks.remove(declaration);
+    }
+
     public <V extends JavaValue> V executeContext(VMContext ctx) {
-        InsnList list = ctx.method.getInstructions();
+        JavaMethod method = ctx.method;
+        InvocationHook hook = hooks.get(method.getDeclaration());
+        if (hook != null) {
+            return (V) hook.execute(ctx);
+        }
+        InsnList list = method.getInstructions();
         Instructions opset = instructions;
         while (true) {
             AbstractInsnNode insn = list.get(ctx.cursor++);
@@ -106,6 +125,33 @@ public final class VM {
 
     public JavaValue newString(String str) {
         throw new UnsupportedOperationException();
+    }
+
+    public JavaClass primitiveClass(String name) {
+        switch (name) {
+            case "long":
+                return longType;
+            case "double":
+                return doubleType;
+            case "int":
+                return intType;
+            case "float":
+                return floatType;
+            case "short":
+                return shortType;
+            case "char":
+                return charType;
+            case "byte":
+                return byteType;
+            case "boolean":
+                return booleanType;
+            default:
+                throw new IllegalArgumentException(name);
+        }
+    }
+
+    public SystemDictionary getDictionary() {
+        return dictionary;
     }
 
     public JavaValue wrapLdc(Object ldc) {
