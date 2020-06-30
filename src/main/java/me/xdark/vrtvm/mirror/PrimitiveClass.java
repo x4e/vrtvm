@@ -1,17 +1,20 @@
 package me.xdark.vrtvm.mirror;
 
 import me.xdark.vrtvm.JavaValue;
+import me.xdark.vrtvm.VM;
 
 /**
  * Note that these classes will NOT be linked to {@link me.xdark.vrtvm.SystemDictionary}
  */
 public final class PrimitiveClass implements JavaClass {
+    private final VM vm;
     private final String name;
     private final String internalName;
     private final JavaValue protectionDomain;
     private JavaValue handle;
 
-    public PrimitiveClass(String name, String internalName, JavaValue protectionDomain) {
+    public PrimitiveClass(VM vm, String name, String internalName, JavaValue protectionDomain) {
+        this.vm = vm;
         this.name = name;
         this.internalName = internalName;
         this.protectionDomain = protectionDomain;
@@ -145,4 +148,18 @@ public final class PrimitiveClass implements JavaClass {
     public void setHandle(JavaValue handle) {
         this.handle = handle;
     }
+
+    @Override
+    public JavaClass newArrayClass(int dimension) {
+        String name = getInternalName();
+        StringBuilder builder = new StringBuilder(dimension + name.length());
+        for (int i = 0; i < dimension; i++) {
+            builder.append('[');
+        }
+        String arrayName = builder.append(name).toString();
+        return new ArrayClass(arrayName, protectionDomain, this, vm.objectClass());
+    }
+
+    @Override
+    public void resolve() { }
 }

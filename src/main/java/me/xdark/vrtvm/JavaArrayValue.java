@@ -13,6 +13,11 @@ public final class JavaArrayValue extends JavaValue {
         Arrays.fill(this.backing = new JavaValue[size], dflt);
     }
 
+    public JavaArrayValue(VM vm, JavaValue[] backing) {
+        super(vm);
+        this.backing = backing;
+    }
+
     public JavaValue get(int index) {
         return backing[index];
     }

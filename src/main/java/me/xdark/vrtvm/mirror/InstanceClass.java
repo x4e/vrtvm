@@ -1,49 +1,54 @@
 package me.xdark.vrtvm.mirror;
 
 import me.xdark.vrtvm.JavaValue;
+import me.xdark.vrtvm.VM;
+import org.objectweb.asm.tree.ClassNode;
 
-public final class ArrayClass implements JavaClass {
-    private final String name;
-    private final JavaValue protectionDomain;
-    private final JavaClass componentType;
-    private final JavaClass objectClass;
+import java.lang.reflect.Modifier;
+
+public final class InstanceClass implements JavaClass {
+    private final VM vm;
+    private final JavaValue classLoader;
+    private final ClassNode classNode;
+    private JavaValue protectionDomain;
+    private JavaClass superclass;
+    private JavaClass[] interfaces;
     private JavaValue handle;
 
-    public ArrayClass(String name, JavaValue protectionDomain, JavaClass componentType, JavaClass objectClass) {
-        this.name = name;
-        this.protectionDomain = protectionDomain;
-        this.componentType = componentType;
-        this.objectClass = objectClass;
+    public InstanceClass(VM vm, JavaValue classLoader, ClassNode classNode) {
+        this.vm = vm;
+        this.classLoader = classLoader;
+        this.classNode = classNode;
     }
 
     @Override
     public String getName() {
-        return name;
+        return classNode.name.replace('/', '.');
     }
 
     @Override
     public String getInternalName() {
-        return name;
+        return 'L' + classNode.name + ';';
     }
 
     @Override
     public boolean isInstance(JavaValue value) {
-        return value.getJClass() == this;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isAssignableFrom(JavaClass cls) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isInterface() {
-        return false;
+        return Modifier.isInterface(classNode.access);
     }
 
     @Override
     public boolean isArray() {
-        return true;
+        return false;
     }
 
     @Override
@@ -53,22 +58,22 @@ public final class ArrayClass implements JavaClass {
 
     @Override
     public JavaClass getSuperclass() {
-        return objectClass;
+        return superclass;
     }
 
     @Override
     public JavaClass[] getInterfaces() {
-        return new JavaClass[0];
+        return interfaces;
     }
 
     @Override
     public JavaClass getComponentType() {
-        return componentType;
+        return null;
     }
 
     @Override
     public int getModifiers() {
-        return 1041;
+        return classNode.access;
     }
 
     @Override
@@ -77,8 +82,7 @@ public final class ArrayClass implements JavaClass {
     }
 
     @Override
-    public void setSigners(JavaValue[] signers) {
-    }
+    public void setSigners(JavaValue[] signers) { }
 
     @Override
     public JavaValue[] getEnclosingMethod() {
@@ -92,7 +96,7 @@ public final class ArrayClass implements JavaClass {
 
     @Override
     public JavaValue getProtectionDomain() {
-        return protectionDomain;
+        return null;
     }
 
     @Override
@@ -102,17 +106,17 @@ public final class ArrayClass implements JavaClass {
 
     @Override
     public byte[] getRawAnnotations() {
-        return RAW_ANNOTATIONS;
+        return new byte[0];
     }
 
     @Override
     public byte[] getRawTypeAnnotations() {
-        return RAW_ANNOTATIONS;
+        return new byte[0];
     }
 
     @Override
     public JavaValue getConstantPool() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
@@ -147,8 +151,13 @@ public final class ArrayClass implements JavaClass {
 
     @Override
     public JavaClass newArrayClass(int dimension) {
-        // TODO implement multidimensional arrays?
-        throw new UnsupportedOperationException();
+        String name = getInternalName();
+        StringBuilder builder = new StringBuilder(dimension + name.length());
+        for (int i = 0; i < dimension; i++) {
+            builder.append('[');
+        }
+        String arrayName = builder.append(name).toString();
+        return new ArrayClass(arrayName, protectionDomain, this, vm.objectClass());
     }
 
     @Override

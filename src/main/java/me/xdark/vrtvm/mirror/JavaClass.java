@@ -60,4 +60,8 @@ public interface JavaClass {
     JavaValue getHandle();
 
     void setHandle(JavaValue handle);
+
+    JavaClass newArrayClass(int dimension);
+
+    void resolve();
 }
