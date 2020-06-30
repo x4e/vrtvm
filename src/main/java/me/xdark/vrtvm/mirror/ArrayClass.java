@@ -91,6 +91,11 @@ public final class ArrayClass implements JavaClass {
     }
 
     @Override
+    public void setProtectionDomain(JavaValue protectionDomain) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public JavaValue getProtectionDomain() {
         return protectionDomain;
     }

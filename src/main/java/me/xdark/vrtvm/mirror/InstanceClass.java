@@ -95,8 +95,13 @@ public final class InstanceClass implements JavaClass {
     }
 
     @Override
+    public void setProtectionDomain(JavaValue protectionDomain) {
+        this.protectionDomain = protectionDomain;
+    }
+
+    @Override
     public JavaValue getProtectionDomain() {
-        return null;
+        return protectionDomain;
     }
 
     @Override

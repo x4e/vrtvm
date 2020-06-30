@@ -39,6 +39,8 @@ public interface JavaClass {
 
     JavaClass getDeclaringClass();
 
+    void setProtectionDomain(JavaValue protectionDomain);
+
     JavaValue getProtectionDomain();
 
     String getGenericSignature();

@@ -26,6 +26,10 @@ public final class JavaArrayValue extends JavaValue {
         backing[index] = value;
     }
 
+    public int length() {
+        return backing.length;
+    }
+
     @Override
     public boolean matches(ValueType type) {
         return type == ValueType.OBJECT || type == ValueType.ARRAY;

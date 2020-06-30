@@ -5,9 +5,7 @@ import me.xdark.vrtvm.VM;
 import me.xdark.vrtvm.mirror.JavaClass;
 
 public final class ClassHooks {
-
-    private ClassHooks() {
-    }
+    private ClassHooks() { }
 
     public static void setup(VM vm) {
         vm.installHook(newDeclaration("isInstance", "(Ljava/lang/Object;)Z"), ctx -> {

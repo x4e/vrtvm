@@ -5,7 +5,10 @@ import me.xdark.vrtvm.mirror.InstanceClass;
 import me.xdark.vrtvm.mirror.JavaClass;
 import me.xdark.vrtvm.mirror.JavaMethod;
 import me.xdark.vrtvm.mirror.PrimitiveClass;
+import me.xdark.vrtvm.natives.ClassHooks;
+import me.xdark.vrtvm.natives.ClassLoaderHooks;
 import me.xdark.vrtvm.natives.InvocationHook;
+import me.xdark.vrtvm.natives.ObjectHooks;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -48,6 +51,9 @@ public final class VM {
         _null = new NullJavaValue(this);
         _top = new TopJavaValue(this);
         instructions = new Instructions();
+        ClassHooks.setup(this);
+        ClassLoaderHooks.setup(this);
+        ObjectHooks.setup(this);
     }
 
     public void installHook(MemberDeclaration declaration, InvocationHook hook) {
@@ -92,6 +98,10 @@ public final class VM {
     }
 
     public JavaValue nullValue() {
+        return _null;
+    }
+
+    public JavaValue voidValue() {
         return _null;
     }
 
@@ -160,7 +170,11 @@ public final class VM {
         }
     }
 
-    public JavaClass defineClass(JavaValue classLoader, String name, byte[] code, int off, int len) {
+    public JavaClass findLoadedClass(JavaValue classLoader, String name) {
+        return dictionary.getLinkedClass(new SystemDictionary.DictionaryEntry(classLoader, name.replace('.', '/')));
+    }
+
+    public JavaClass defineClass(JavaValue classLoader, JavaValue protectionDomain, String name, byte[] code, int off, int len) {
         if (off < 0) {
             throw new IllegalStateException("Offset is negative!");
         } else if (len > code.length) {
@@ -181,6 +195,7 @@ public final class VM {
         classReader.accept(node, 0);
         JavaClass jClass = new InstanceClass(this, classLoader, node);
         assignClassHandle(jClass);
+        jClass.setProtectionDomain(protectionDomain);
         // Link into system dictionary
         dictionary.linkClass(new SystemDictionary.DictionaryEntry(classLoader, name), jClass);
         return jClass;
