@@ -1,6 +1,7 @@
 package me.xdark.vrtvm.mirror;
 
 import me.xdark.vrtvm.JavaValue;
+import me.xdark.vrtvm.MemberDeclaration;
 import me.xdark.vrtvm.VM;
 
 /**
@@ -28,6 +29,16 @@ public final class PrimitiveClass implements JavaClass {
     @Override
     public String getInternalName() {
         return internalName;
+    }
+
+    @Override
+    public String getSourceFile() {
+        return null;
+    }
+
+    @Override
+    public String getSourceDebug() {
+        return null;
     }
 
     @Override
@@ -142,6 +153,11 @@ public final class PrimitiveClass implements JavaClass {
     @Override
     public JavaClass[] getDeclaredClasses() {
         return new JavaClass[0];
+    }
+
+    @Override
+    public JavaMethod getMethod(MemberDeclaration declaration) {
+        return null;
     }
 
     @Override

@@ -11,6 +11,10 @@ public final class MemberDeclaration {
         this.desc = desc;
     }
 
+    public MemberDeclaration(String name, String desc) {
+        this(null, name, desc);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

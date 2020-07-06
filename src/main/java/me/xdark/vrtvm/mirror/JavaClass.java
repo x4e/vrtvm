@@ -1,6 +1,7 @@
 package me.xdark.vrtvm.mirror;
 
 import me.xdark.vrtvm.JavaValue;
+import me.xdark.vrtvm.MemberDeclaration;
 
 public interface JavaClass {
     /**
@@ -12,6 +13,10 @@ public interface JavaClass {
     String getName();
 
     String getInternalName();
+
+    String getSourceFile();
+
+    String getSourceDebug();
 
     boolean isInstance(JavaValue value);
 
@@ -56,6 +61,8 @@ public interface JavaClass {
     JavaValue[] getDeclaredMethods(boolean publicOnly);
 
     JavaValue[] getDeclaredConstructors(boolean publicOnly);
+
+    JavaMethod getMethod(MemberDeclaration declaration);
 
     JavaClass[] getDeclaredClasses();
 

@@ -1,6 +1,7 @@
 package me.xdark.vrtvm.mirror;
 
 import me.xdark.vrtvm.JavaValue;
+import me.xdark.vrtvm.MemberDeclaration;
 import me.xdark.vrtvm.VM;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -29,6 +30,16 @@ public final class InstanceClass implements JavaClass {
     @Override
     public String getInternalName() {
         return 'L' + classNode.name + ';';
+    }
+
+    @Override
+    public String getSourceFile() {
+        return classNode.sourceFile;
+    }
+
+    @Override
+    public String getSourceDebug() {
+        return classNode.sourceDebug;
     }
 
     @Override
@@ -142,6 +153,11 @@ public final class InstanceClass implements JavaClass {
     @Override
     public JavaClass[] getDeclaredClasses() {
         return new JavaClass[0];
+    }
+
+    @Override
+    public JavaMethod getMethod(MemberDeclaration declaration) {
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override

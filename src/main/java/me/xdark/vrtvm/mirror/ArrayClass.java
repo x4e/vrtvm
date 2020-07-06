@@ -1,6 +1,7 @@
 package me.xdark.vrtvm.mirror;
 
 import me.xdark.vrtvm.JavaValue;
+import me.xdark.vrtvm.MemberDeclaration;
 
 public final class ArrayClass implements JavaClass {
     private final String name;
@@ -24,6 +25,16 @@ public final class ArrayClass implements JavaClass {
     @Override
     public String getInternalName() {
         return name;
+    }
+
+    @Override
+    public String getSourceFile() {
+        return null;
+    }
+
+    @Override
+    public String getSourceDebug() {
+        return null;
     }
 
     @Override
@@ -138,6 +149,11 @@ public final class ArrayClass implements JavaClass {
     @Override
     public JavaClass[] getDeclaredClasses() {
         return new JavaClass[0];
+    }
+
+    @Override
+    public JavaMethod getMethod(MemberDeclaration declaration) {
+        return null;
     }
 
     @Override

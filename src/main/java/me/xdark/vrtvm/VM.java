@@ -1,6 +1,7 @@
 package me.xdark.vrtvm;
 
 import me.xdark.vrtvm.interpreter.InstructionInterpreter;
+import me.xdark.vrtvm.logging.VMLogger;
 import me.xdark.vrtvm.mirror.InstanceClass;
 import me.xdark.vrtvm.mirror.JavaClass;
 import me.xdark.vrtvm.mirror.JavaMethod;
@@ -15,10 +16,15 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 public final class VM {
+    private final VMLogger logger;
     private final SystemDictionary dictionary;
     private final JavaClass longType;
     private final JavaClass doubleType;
@@ -33,8 +39,12 @@ public final class VM {
     private final JavaValue _top;
     private final Instructions instructions;
     private final Map<MemberDeclaration, InvocationHook> hooks = new HashMap<>(64);
+    private final Set<VMThread> vmThreads = Collections.newSetFromMap(new WeakHashMap<>());
+    private final Object threadLock = new Object();
+    private boolean panicked;
 
-    public VM() {
+    public VM(VMLogger logger) {
+        this.logger = logger;
         // Setup dictionary
         dictionary = new SystemDictionary();
         // Setup primitives
@@ -56,6 +66,22 @@ public final class VM {
         ObjectHooks.setup(this);
     }
 
+    public void registerThread(VMThread thread) {
+        synchronized (threadLock) {
+            if (!vmThreads.add(thread)) {
+                panic("duplicate thread");
+            }
+        }
+    }
+
+    public void unregisterThread(VMThread owner) {
+        synchronized (threadLock) {
+            if (!vmThreads.remove(owner)) {
+                panic("attempted to remove non-existing thread");
+            }
+        }
+    }
+
     public void installHook(MemberDeclaration declaration, InvocationHook hook) {
         hooks.put(declaration, hook);
     }
@@ -64,37 +90,85 @@ public final class VM {
         hooks.remove(declaration);
     }
 
+    public <V extends JavaValue> V executeResolve(JavaValue handle, MemberDeclaration declaration, boolean runHooks, JavaValue... args) {
+        JavaClass jclass = handle.getJClass();
+
+        JavaMethod method;
+        do {
+            method = jclass.getMethod(declaration);
+        } while (method == null && (jclass = jclass.getSuperclass()) != null);
+        if (method == null) {
+            throw new UnsupportedOperationException();
+        }
+        return executeContext(method.newContext(this, handle, args), runHooks);
+    }
+
     public <V extends JavaValue> V executeContext(VMContext ctx, boolean runHooks) {
+        VMThread thread = (VMThread) Thread.currentThread();
         JavaMethod method = ctx.method;
+        StackTraceElement element = new StackTraceElement(method.getDeclaringClass().getName(), method.getName(), method.getDeclaringClass().getSourceFile(), -1);
+        thread.pushEntry(element);
         if (runHooks) {
             InvocationHook hook = hooks.get(method.getDeclaration());
             if (hook != null) {
-                return (V) hook.execute(ctx);
+                try {
+                    return (V) hook.execute(ctx);
+                } finally {
+                    thread.pop();
+                }
             }
         }
         InsnList list = method.getInstructions();
         Instructions opset = instructions;
-        while (true) {
-            AbstractInsnNode insn = list.get(ctx.cursor++);
-            int opcode = insn.getOpcode();
-            if (opcode == -1) {
-                continue;
-            }
-            InstructionInterpreter interpreter = opset.forOpcode(opcode);
-            if (interpreter == null) {
-                throw new UnsupportedOperationException("Unsupported opcode: " + opcode);
-            }
-            try {
-                interpreter.process(ctx, insn);
-            } catch (ContextExitSignal ignored) {
-                VMStack stack = ctx.stack;
-                V v = stack.pop();
-                if (!stack.isEmpty()) {
-                    throw new IllegalStateException("Stack is not empty after execution");
+        try {
+            while (true) {
+                AbstractInsnNode insn = list.get(ctx.cursor++);
+                int opcode = insn.getOpcode();
+                if (opcode == -1) {
+                    continue;
                 }
-                return v;
+                InstructionInterpreter interpreter = opset.forOpcode(opcode);
+                if (interpreter == null) {
+                    throw new UnsupportedOperationException("Unsupported opcode: " + opcode);
+                }
+                try {
+                    interpreter.process(ctx, insn);
+                } catch (ContextExitSignal ignored) {
+                    VMStack stack = ctx.stack;
+                    V v = stack.pop();
+                    if (!stack.isEmpty()) {
+                        throw new IllegalStateException("Stack is not empty after execution");
+                    }
+                    return v;
+                }
+            }
+        } finally {
+            thread.pop();
+        }
+    }
+
+    public void panic(String reason) {
+        if (panicked) {
+            throw new InternalError();
+        }
+        panicked = true;
+        VMLogger logger = this.logger;
+        logger.panic("A fatal error has been detected, cannot continue: %s", reason);
+        Set<VMThread> vmThreads = this.vmThreads;
+        for (VMThread thread : vmThreads) {
+            LinkedList<StackTraceElement> stack = thread.captureStack();
+            thread.interrupt();
+            try {
+                thread.join(1000L);
+            } catch (InterruptedException ex) {
+                // No luck
+                thread.stop();
+            }
+            while (!stack.isEmpty()) {
+                logger.panic("\t %s", stack.poll());
             }
         }
+        vmThreads.clear();
     }
 
     public JavaValue nullValue() {
