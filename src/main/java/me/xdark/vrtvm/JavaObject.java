@@ -61,7 +61,7 @@ public class JavaObject extends JavaValue {
     }
 
     @Override
-    void setJClass(JavaClass jClass) {
+    public void setJClass(JavaClass jClass) {
         this.jClass = jClass;
     }
 }

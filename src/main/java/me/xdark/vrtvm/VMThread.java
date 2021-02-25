@@ -5,11 +5,13 @@ import java.util.LinkedList;
 public final class VMThread extends Thread {
     private final VM vm;
     private final JavaObject handle;
+    private final MemberDeclaration member;
     private final LinkedList<StackTraceElement> stack = new LinkedList<>();
 
-    public VMThread(VM vm, JavaObject handle) {
+    public VMThread(VM vm, JavaObject handle, MemberDeclaration startMethod) {
         this.vm = vm;
         this.handle = handle;
+        this.member = startMethod;
     }
 
     public StackTraceElement pop() {
@@ -29,11 +31,14 @@ public final class VMThread extends Thread {
         VM vm = this.vm;
         vm.registerThread(this);
         try {
-            vm.executeResolve(handle, new MemberDeclaration("run", "()V"), true);
+            vm.executeResolve(handle, member, true);
         } finally {
             vm.unregisterThread(this);
             if (!stack.isEmpty()) {
                 vm.panic("thread stack corruption");
+            }
+            synchronized (this) {
+                this.notifyAll();
             }
         }
     }

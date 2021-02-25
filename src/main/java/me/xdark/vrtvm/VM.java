@@ -63,8 +63,8 @@ public final class VM {
         booleanType = newPrimitiveClass("boolean", "Z");
         voidType = newPrimitiveClass("void", "V");
         // Setup internals
-        _null = new NullJavaValue(this);
-        _top = new TopJavaValue(this);
+        _null = new NullJavaValue();
+        _top = new TopJavaValue();
         instructions = new Instructions();
         ClassHooks.setup(this);
         ClassLoaderHooks.setup(this);
@@ -310,7 +310,7 @@ public final class VM {
     public JavaArrayValue getInterfaces(JavaClass jClass) {
         JavaClass[] interfaces = jClass.getInterfaces();
         int j = interfaces.length;
-        JavaArrayValue arr = new JavaArrayValue(this, j, _null);
+        JavaArrayValue arr = new JavaArrayValue(j, _null);
         while (j-- > 0) {
             arr.set(j, interfaces[j].getHandle());
         }
@@ -349,7 +349,7 @@ public final class VM {
     }
 
     private void assignClassHandle(JavaClass jClass) {
-        JavaObject object = new JavaObject(this);
+        JavaObject object = new JavaObject();
         object.setJClass(jClass); // maybe we can avoid doing that?...
         jClass.setHandle(object);
     }
