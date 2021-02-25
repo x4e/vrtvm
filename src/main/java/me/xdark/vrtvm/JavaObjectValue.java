@@ -5,10 +5,6 @@ import me.xdark.vrtvm.mirror.JavaClass;
 public final class JavaObjectValue extends JavaValue {
     private JavaClass jClass;
 
-    public JavaObjectValue(VM vm) {
-        super(vm);
-    }
-
     @Override
     public boolean matches(ValueType type) {
         return type == ValueType.OBJECT;

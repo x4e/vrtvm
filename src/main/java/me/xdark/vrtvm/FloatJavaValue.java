@@ -5,8 +5,7 @@ import me.xdark.vrtvm.mirror.JavaClass;
 public final class FloatJavaValue extends JavaValue {
     private final float value;
 
-    protected FloatJavaValue(VM vm, float value) {
-        super(vm);
+    protected FloatJavaValue(float value) {
         this.value = value;
     }
 

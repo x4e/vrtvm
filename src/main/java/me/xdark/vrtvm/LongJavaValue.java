@@ -5,8 +5,7 @@ import me.xdark.vrtvm.mirror.JavaClass;
 public final class LongJavaValue extends JavaValue {
     private final long value;
 
-    protected LongJavaValue(VM vm, long value) {
-        super(vm);
+    protected LongJavaValue(long value) {
         this.value = value;
     }
 

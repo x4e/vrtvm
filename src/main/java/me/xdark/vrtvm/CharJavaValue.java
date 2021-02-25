@@ -5,8 +5,7 @@ import me.xdark.vrtvm.mirror.JavaClass;
 public final class CharJavaValue extends JavaValue {
     private final char value;
 
-    protected CharJavaValue(VM vm, char value) {
-        super(vm);
+    protected CharJavaValue(char value) {
         this.value = value;
     }
 

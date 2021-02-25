@@ -5,8 +5,7 @@ import me.xdark.vrtvm.mirror.JavaClass;
 public final class ByteJavaValue extends JavaValue {
     private final byte value;
 
-    protected ByteJavaValue(VM vm, byte value) {
-        super(vm);
+    protected ByteJavaValue(byte value) {
         this.value = value;
     }
 

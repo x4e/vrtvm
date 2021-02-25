@@ -5,8 +5,7 @@ import me.xdark.vrtvm.mirror.JavaClass;
 public final class DoubleJavaValue extends JavaValue {
     private final double value;
 
-    protected DoubleJavaValue(VM vm, double value) {
-        super(vm);
+    protected DoubleJavaValue(double value) {
         this.value = value;
     }
 

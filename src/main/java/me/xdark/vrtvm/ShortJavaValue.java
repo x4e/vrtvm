@@ -5,8 +5,7 @@ import me.xdark.vrtvm.mirror.JavaClass;
 public final class ShortJavaValue extends JavaValue {
     private final short value;
 
-    protected ShortJavaValue(VM vm, short value) {
-        super(vm);
+    protected ShortJavaValue(short value) {
         this.value = value;
     }
 

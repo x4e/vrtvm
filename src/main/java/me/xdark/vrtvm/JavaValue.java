@@ -3,12 +3,7 @@ package me.xdark.vrtvm;
 import me.xdark.vrtvm.mirror.JavaClass;
 
 public abstract class JavaValue implements ReferenceCounted {
-    protected final VM vm;
     private int refCount;
-
-    protected JavaValue(VM vm) {
-        this.vm = vm;
-    }
 
     public abstract boolean matches(ValueType type);
 

@@ -8,13 +8,11 @@ public final class JavaArrayValue extends JavaValue {
     private final JavaValue[] backing;
     private JavaClass jClass;
 
-    public JavaArrayValue(VM vm, int size, JavaValue dflt) {
-        super(vm);
+    public JavaArrayValue(int size, JavaValue dflt) {
         Arrays.fill(this.backing = new JavaValue[size], dflt);
     }
 
-    public JavaArrayValue(VM vm, JavaValue[] backing) {
-        super(vm);
+    public JavaArrayValue(JavaValue[] backing) {
         this.backing = backing;
     }
 

@@ -3,10 +3,6 @@ package me.xdark.vrtvm;
 import me.xdark.vrtvm.mirror.JavaClass;
 
 public abstract class InternalJavaValue extends JavaValue {
-    protected InternalJavaValue(VM vm) {
-        super(vm);
-    }
-
     @Override
     public long longValue() {
         throw new UnsupportedOperationException();
