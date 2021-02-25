@@ -16,7 +16,7 @@ public final class BiIntJumpHandler implements InstructionInterpreter<JumpInsnNo
         VMStack stack = ctx.stack;
         int v2 = stack.pop().intValue(), v1 =stack.pop().intValue();
         if (predicate.test(v1,v2)) {
-            ctx.cursor(insn.label);
+            ctx.jumpTo(insn.label);
         }
     }
 

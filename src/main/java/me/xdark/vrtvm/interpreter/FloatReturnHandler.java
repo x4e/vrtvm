@@ -7,6 +7,6 @@ import org.objectweb.asm.tree.InsnNode;
 public final class FloatReturnHandler implements InstructionInterpreter<InsnNode> {
     @Override
     public void process(VMStackFrame ctx, InsnNode insn) {
-        throw ContextExitSignal.INSTANCE;
+        ctx._return();
     }
 }

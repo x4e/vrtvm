@@ -118,29 +118,33 @@ public final class VM {
                 }
             }
         }
-        InsnList list = method.getInstructions();
         Instructions opset = instructions;
         try {
             while (true) {
-                AbstractInsnNode insn = list.get(ctx.cursor++);
+                AbstractInsnNode insn = ctx.pc;
+                
+                if (insn == null) {
+                	// Either we've fallen through the code end or we've reached a return
+	                // We will assume a return
+	
+	                // Last item on stack is the return value
+	                // Will be null if the method didn't return a value
+	                return ctx.stack.pop();
+                }
+	            ctx.pc = insn.getNext(); // Increment PC
+                
                 int opcode = insn.getOpcode();
+                // Skip ASM instructions (e.g. stackmap frames)
                 if (opcode == -1) {
                     continue;
                 }
+                
                 InstructionInterpreter interpreter = opset.forOpcode(opcode);
                 if (interpreter == null) {
                     throw new UnsupportedOperationException("Unsupported opcode: " + opcode);
                 }
-                try {
-                    interpreter.process(ctx, insn);
-                } catch (ContextExitSignal ignored) {
-                    VMStack stack = ctx.stack;
-                    V v = stack.pop();
-                    if (!stack.isEmpty()) {
-                        throw new IllegalStateException("Stack is not empty after execution");
-                    }
-                    return v;
-                }
+	
+	            interpreter.process(ctx, insn);
             }
         } finally {
             thread.pop();

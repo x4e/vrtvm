@@ -13,6 +13,6 @@ public final class DoubleReturnHandler implements InstructionInterpreter<InsnNod
         if (!pop.matches(ValueType.TOP)) {
             throw new IllegalStateException("Expected to pop top, but got: " + pop);
         }
-        throw ContextExitSignal.INSTANCE;
+        ctx._return();
     }
 }

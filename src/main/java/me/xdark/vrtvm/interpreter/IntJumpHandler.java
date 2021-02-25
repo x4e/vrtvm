@@ -13,7 +13,7 @@ public final class IntJumpHandler implements InstructionInterpreter<JumpInsnNode
     @Override
     public void process(VMStackFrame ctx, JumpInsnNode insn) {
         if (predicate.test(ctx.stack.pop().intValue())) {
-            ctx.cursor(insn.label);
+            ctx._return();
         }
     }
 

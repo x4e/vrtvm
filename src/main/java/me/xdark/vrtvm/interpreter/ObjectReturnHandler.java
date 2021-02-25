@@ -7,6 +7,6 @@ import org.objectweb.asm.tree.InsnNode;
 public final class ObjectReturnHandler implements InstructionInterpreter<InsnNode> {
     @Override
     public void process(VMStackFrame ctx, InsnNode insn) {
-        throw ContextExitSignal.INSTANCE;
+        ctx._return();
     }
 }

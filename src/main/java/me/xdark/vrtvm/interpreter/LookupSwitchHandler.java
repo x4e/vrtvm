@@ -8,6 +8,10 @@ public final class LookupSwitchHandler implements InstructionInterpreter<LookupS
     public void process(VMStackFrame ctx, LookupSwitchInsnNode insn) {
         int key = ctx.stack.pop().intValue();
         int index = insn.keys.indexOf(key);
-        ctx.cursor((index == -1) ? insn.dflt : insn.labels.get(index));
+        if (index == -1) {
+            ctx.jumpTo(insn.dflt);
+        } else {
+            ctx.jumpTo(insn.labels.get(index));
+        }
     }
 }

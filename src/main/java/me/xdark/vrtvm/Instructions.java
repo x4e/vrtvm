@@ -128,6 +128,11 @@ public final class Instructions {
     }
 
     public <T extends AbstractInsnNode> InstructionInterpreter<T> forOpcode(int opcode) {
-        return (InstructionInterpreter<T>) interpreters[opcode];
+    	try {
+		    return (InstructionInterpreter<T>) interpreters[opcode];
+	    } catch (ArrayIndexOutOfBoundsException ex) {
+    		// Unsupported opcode
+    		return null;
+	    }
     }
 }

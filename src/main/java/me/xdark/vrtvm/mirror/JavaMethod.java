@@ -47,7 +47,7 @@ public final class JavaMethod {
                 locals.store(index++, vm.topValue());
             }
         }
-        return new VMStackFrame(vm, new VMStack(maxStack, vm.nullValue(), vm.topValue()), locals, handle, args, this);
+        return new VMStackFrame(vm, new VMStack(maxStack, vm.nullValue(), vm.topValue()), locals, handle, this);
     }
 
     public String getName() {

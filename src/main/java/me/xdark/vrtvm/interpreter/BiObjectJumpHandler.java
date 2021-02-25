@@ -19,7 +19,7 @@ public final class BiObjectJumpHandler implements InstructionInterpreter<JumpIns
         VMStack stack = ctx.stack;
         JavaValue v2 = stack.pop(), v1 = stack.pop();
         if (predicate.test(v1, v2)) {
-            ctx.cursor(insn.label);
+            ctx.jumpTo(insn.label);
         }
     }
 }
