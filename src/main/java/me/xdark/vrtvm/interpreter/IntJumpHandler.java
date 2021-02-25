@@ -1,6 +1,6 @@
 package me.xdark.vrtvm.interpreter;
 
-import me.xdark.vrtvm.VMContext;
+import me.xdark.vrtvm.VMStackFrame;
 import org.objectweb.asm.tree.JumpInsnNode;
 
 public final class IntJumpHandler implements InstructionInterpreter<JumpInsnNode> {
@@ -11,7 +11,7 @@ public final class IntJumpHandler implements InstructionInterpreter<JumpInsnNode
     }
 
     @Override
-    public void process(VMContext ctx, JumpInsnNode insn) {
+    public void process(VMStackFrame ctx, JumpInsnNode insn) {
         if (predicate.test(ctx.stack.pop().intValue())) {
             ctx.cursor(insn.label);
         }

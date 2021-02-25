@@ -1,11 +1,11 @@
 package me.xdark.vrtvm.interpreter;
 
-import me.xdark.vrtvm.VMContext;
+import me.xdark.vrtvm.VMStackFrame;
 import org.objectweb.asm.tree.VarInsnNode;
 
 public final class IntStoreHandler implements InstructionInterpreter<VarInsnNode> {
     @Override
-    public void process(VMContext ctx, VarInsnNode insn) {
+    public void process(VMStackFrame ctx, VarInsnNode insn) {
         ctx.locals.store(insn.var, ctx.stack.pop());
     }
 }

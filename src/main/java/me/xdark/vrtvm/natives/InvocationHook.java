@@ -1,8 +1,8 @@
 package me.xdark.vrtvm.natives;
 
 import me.xdark.vrtvm.JavaValue;
-import me.xdark.vrtvm.VMContext;
+import me.xdark.vrtvm.VMStackFrame;
 
 public interface InvocationHook {
-    JavaValue execute(VMContext ctx);
+    JavaValue execute(VMStackFrame ctx);
 }

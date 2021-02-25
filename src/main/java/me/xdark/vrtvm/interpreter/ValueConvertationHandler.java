@@ -2,7 +2,7 @@ package me.xdark.vrtvm.interpreter;
 
 import me.xdark.vrtvm.JavaValue;
 import me.xdark.vrtvm.VM;
-import me.xdark.vrtvm.VMContext;
+import me.xdark.vrtvm.VMStackFrame;
 import me.xdark.vrtvm.VMStack;
 import org.objectweb.asm.tree.AbstractInsnNode;
 
@@ -16,7 +16,7 @@ public final class ValueConvertationHandler implements InstructionInterpreter<Ab
     }
 
     @Override
-    public void process(VMContext ctx, AbstractInsnNode insn) {
+    public void process(VMStackFrame ctx, AbstractInsnNode insn) {
         VMStack stack = ctx.stack;
         stack.push(function.apply(ctx.vm, top ? stack.popTop() : stack.pop()));
     }

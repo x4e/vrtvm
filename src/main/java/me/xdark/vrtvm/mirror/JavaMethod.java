@@ -35,7 +35,7 @@ public final class JavaMethod {
         this(node.name, node.desc, node.access, /* TODO */null,/* TODO */ null, /* TODO */null, node.instructions, node.maxLocals, node.maxStack);
     }
 
-    public VMContext newContext(VM vm, JavaValue handle, JavaValue... args) {
+    public VMStackFrame newContext(VM vm, JavaValue handle, JavaValue... args) {
         VMLocals locals = new VMLocals(maxLocals, vm.nullValue());
         int index = 0;
         if (!Modifier.isStatic(modifiers)) {
@@ -47,7 +47,7 @@ public final class JavaMethod {
                 locals.store(index++, vm.topValue());
             }
         }
-        return new VMContext(vm, new VMStack(maxStack, vm.nullValue(), vm.topValue()), locals, handle, args, this);
+        return new VMStackFrame(vm, new VMStack(maxStack, vm.nullValue(), vm.topValue()), locals, handle, args, this);
     }
 
     public String getName() {

@@ -103,7 +103,7 @@ public final class VM {
         return executeContext(method.newContext(this, handle, args), runHooks);
     }
 
-    public <V extends JavaValue> V executeContext(VMContext ctx, boolean runHooks) {
+    public <V extends JavaValue> V executeContext(VMStackFrame ctx, boolean runHooks) {
         VMThread thread = (VMThread) Thread.currentThread();
         JavaMethod method = ctx.method;
         StackTraceElement element = new StackTraceElement(method.getDeclaringClass().getName(), method.getName(), method.getDeclaringClass().getSourceFile(), -1);

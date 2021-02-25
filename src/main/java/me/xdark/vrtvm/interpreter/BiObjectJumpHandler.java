@@ -1,12 +1,11 @@
 package me.xdark.vrtvm.interpreter;
 
 import me.xdark.vrtvm.JavaValue;
-import me.xdark.vrtvm.VMContext;
+import me.xdark.vrtvm.VMStackFrame;
 import me.xdark.vrtvm.VMStack;
 import org.objectweb.asm.tree.JumpInsnNode;
 
 import java.util.function.BiPredicate;
-import java.util.function.Predicate;
 
 public final class BiObjectJumpHandler implements InstructionInterpreter<JumpInsnNode> {
     private final BiPredicate<JavaValue, JavaValue> predicate;
@@ -16,7 +15,7 @@ public final class BiObjectJumpHandler implements InstructionInterpreter<JumpIns
     }
 
     @Override
-    public void process(VMContext ctx, JumpInsnNode insn) {
+    public void process(VMStackFrame ctx, JumpInsnNode insn) {
         VMStack stack = ctx.stack;
         JavaValue v2 = stack.pop(), v1 = stack.pop();
         if (predicate.test(v1, v2)) {
