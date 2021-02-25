@@ -1,6 +1,7 @@
 package me.xdark.vrtvm;
 
 import me.xdark.vrtvm.interpreter.InstructionInterpreter;
+import me.xdark.vrtvm.logging.PrintStreamVMLogger;
 import me.xdark.vrtvm.logging.VMLogger;
 import me.xdark.vrtvm.mirror.InstanceClass;
 import me.xdark.vrtvm.mirror.JavaClass;
@@ -42,6 +43,10 @@ public final class VM {
     private final Set<VMThread> vmThreads = Collections.newSetFromMap(new WeakHashMap<>());
     private final Object threadLock = new Object();
     private boolean panicked;
+
+    public VM() {
+        this(new PrintStreamVMLogger(System.err));
+    }
 
     public VM(VMLogger logger) {
         this.logger = logger;
@@ -188,35 +193,35 @@ public final class VM {
     }
 
     public JavaValue newLong(long v) {
-        return new LongJavaValue(this, v);
+        return new LongJavaValue(v);
     }
 
     public JavaValue newDouble(double v) {
-        return new DoubleJavaValue(this, v);
+        return new DoubleJavaValue(v);
     }
 
     public JavaValue newInt(int v) {
-        return new IntJavaValue(this, v);
+        return new IntJavaValue(v);
     }
 
     public JavaValue newFloat(float v) {
-        return new FloatJavaValue(this, v);
+        return new FloatJavaValue(v);
     }
 
     public JavaValue newShort(short v) {
-        return new ShortJavaValue(this, v);
+        return new ShortJavaValue(v);
     }
 
     public JavaValue newChar(char v) {
-        return new CharJavaValue(this, v);
+        return new CharJavaValue(v);
     }
 
     public JavaValue newByte(byte v) {
-        return new ByteJavaValue(this, v);
+        return new ByteJavaValue(v);
     }
 
     public JavaValue newBoolean(boolean v) {
-        return new ByteJavaValue(this, (byte) (v ? 1 : 0));
+        return new ByteJavaValue((byte) (v ? 1 : 0));
     }
 
     public JavaValue newString(String str) {
@@ -254,21 +259,32 @@ public final class VM {
 
     public JavaClass defineClass(JavaValue classLoader, JavaValue protectionDomain, String name, byte[] code, int off, int len) {
         if (off < 0) {
-            throw new IllegalStateException("Offset is negative!");
+            throw new IndexOutOfBoundsException("Offset is negative!");
         } else if (len > code.length) {
-            throw new IllegalStateException("Code length is too long!");
+            throw new IndexOutOfBoundsException("Code length is too long!");
         }
         if (off != 0 && len != code.length) {
             code = Arrays.copyOfRange(code, off, len);
         }
-        ClassReader classReader = new ClassReader(code);
-        if (name != null) {
-            String actualName = classReader.getClassName();
-            if (!actualName.equals(name)) {
-                throw new IllegalStateException("Wrong class name! Expected: " + actualName);
-            }
-            name = actualName;
+
+        ClassReader classReader;
+        try {
+            classReader = new ClassReader(code);
+        } catch (Throwable t) {
+            ClassFormatError err = new ClassFormatError();
+            err.addSuppressed(t);
+            throw err;
         }
+
+        String actualName = classReader.getClassName();
+        if (name != null && !name.equals(actualName)) {
+            throw new NoClassDefFoundError("Wrong class name! Expected: " + name + ", found: " + name);
+        }
+        if (actualName.startsWith("java.lang")) {
+            throw new SecurityException("Class name '" + actualName + "' not allowed");
+        }
+        name = actualName;
+
         ClassNode node = new ClassNode();
         classReader.accept(node, 0);
         JavaClass jClass = new InstanceClass(this, classLoader, node);
