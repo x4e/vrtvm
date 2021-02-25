@@ -1,6 +1,7 @@
 package me.xdark.vrtvm;
 
 import me.xdark.vrtvm.interpreter.*;
+import me.xdark.vrtvm.interpreter.instructions.*;
 import org.objectweb.asm.tree.AbstractInsnNode;
 
 import static org.objectweb.asm.Opcodes.*;
